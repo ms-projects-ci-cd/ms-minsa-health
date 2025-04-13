@@ -1,0 +1,42 @@
+name: ms-minsa-health
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v3
+
+      - name: config java 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: cache maven
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven
+
+      - name: ======== execute test and coverage ===========
+        run: mvn clean verify
+
+      - name: sonar analyse
+        if: github.event_name != 'pull_request'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn sonar:sonar \
+          -Dsonar.projectKey=ms-minsa-health
+          -Dsonar.organization=ms-projects-ci-cd
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.login=$SONAR_TOKEN
