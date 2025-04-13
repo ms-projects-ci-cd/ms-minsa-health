@@ -35,8 +35,41 @@ jobs:
         if: github.event_name != 'pull_request'
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn sonar:sonar \
-          -Dsonar.projectKey=ms-minsa-health
-          -Dsonar.organization=ms-projects-ci-cd
-          -Dsonar.host.url=https://sonarcloud.io
+        run: |
+          mvn sonar:sonar \
+          -Dsonar.projectKey=ms-projects-ci-cd_ms-minsa-health \
+          -Dsonar.organization=ms-projects-ci-cd \
+          -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=$SONAR_TOKEN
+
+      - name: === configure aws credential ===
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: login to amazon ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: build, tag and push docker image
+        run: |
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/ms-minsa-health:latest
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+
+#      - name: Render final ECS task definition
+#        id: render-task-def
+#        uses: aws-actions/amazon-ecs-render-task-definition@v1
+#        with:
+#          task-definition: ecs-task-definition-base.json
+#          container-name: ms-minsa-health
+#          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-2.amazonaws.com/ms-minsa-health:latest
+#
+#      - name: Deploy to ECS
+#        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+#        with:
+#          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+#          cluster: ms-cluster
+#          service: ms-minsa-health-service
+#          wait-for-service-stability: true
