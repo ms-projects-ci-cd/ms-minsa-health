@@ -4,6 +4,16 @@ Este microservicio forma parte de un sistema distribuido para la gestión de dat
 
 ---
 
+## 📊 Dataset utilizado
+
+- **Nombre:** Student Mental Health
+- **Fuente:** [Kaggle - Student Mental Health](https://datosabiertos.gob.pe/dataset/establecimientos-de-salud)
+- **Descripción:** Este dataset contiene información sobre el estado mental de estudiantes, incluyendo niveles de ansiedad, depresión y acceso a ayuda psicológica. Se puede utilizar para análisis predictivo y generación de reportes.
+
+---
+
+---
+
 ## 🚀 Tecnologías utilizadas
 
 - Java 17
