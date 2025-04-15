@@ -12,8 +12,6 @@ Este microservicio forma parte de un sistema distribuido para la gestión de dat
 
 ---
 
----
-
 ## 🚀 Tecnologías utilizadas
 
 - Java 17
